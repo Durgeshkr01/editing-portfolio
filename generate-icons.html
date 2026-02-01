@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate PWA Icons - DK EDITS</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        h1 { color: #00ff88; }
+        .instructions {
+            background: #1a1a25;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: 2rem auto;
+            text-align: left;
+        }
+        .step {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #12121a;
+            border-radius: 8px;
+            border-left: 3px solid #00ff88;
+        }
+        .step-number {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        a {
+            color: #00ff88;
+        }
+        code {
+            background: #2a2a35;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        canvas { display: none; }
+        .download-section {
+            margin-top: 2rem;
+        }
+        .icon-preview {
+            display: inline-block;
+            margin: 1rem;
+            text-align: center;
+        }
+        .icon-preview img {
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+        }
+        .icon-preview p {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        #generateBtn {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #0a0a0f;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        #generateBtn:hover {
+            transform: scale(1.05);
+        }
+        #downloadLinks {
+            margin-top: 2rem;
+        }
+        #downloadLinks a {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #00ff88;
+            color: #0a0a0f;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 DK EDITS - PWA Icon Generator</h1>
+    
+    <div class="instructions">
+        <h2>📋 Instructions to Create App Icons</h2>
+        
+        <div class="step">
+            <span class="step-number">Step 1:</span> Go to <a href="https://www.canva.com" target="_blank">Canva.com</a> or any image editor
+        </div>
+        
+        <div class="step">
+            <span class="step-number">Step 2:</span> Create a 512x512 pixel square image with your DK EDITS logo
+        </div>
+        
+        <div class="step">
+            <span class="step-number">Step 3:</span> Use <a href="https://realfavicongenerator.net/" target="_blank">Real Favicon Generator</a> to generate all icon sizes
+        </div>
+        
+        <div class="step">
+            <span class="step-number">Step 4:</span> Download and extract icons to the <code>icons/</code> folder with these names:
+            <ul>
+                <li>icon-72x72.png</li>
+                <li>icon-96x96.png</li>
+                <li>icon-128x128.png</li>
+                <li>icon-144x144.png</li>
+                <li>icon-152x152.png</li>
+                <li>icon-192x192.png</li>
+                <li>icon-384x384.png</li>
+                <li>icon-512x512.png</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">Step 5:</span> Or use an online tool like <a href="https://www.pwabuilder.com/imageGenerator" target="_blank">PWA Builder Image Generator</a>
+        </div>
+    </div>
+
+    <h2>🚀 Quick Method: Use Your Logo</h2>
+    <p>Copy your logo image (WhatsApp Image 2026-02-01 at 9.19.14 AM.jpeg) and rename copies as:</p>
+    <ul style="list-style: none; padding: 0;">
+        <li>✅ icons/icon-192x192.png</li>
+        <li>✅ icons/icon-512x512.png</li>
+    </ul>
+    <p>These two sizes are minimum required for PWA to work!</p>
+
+    <div class="download-section">
+        <h2>📱 Online Icon Generators</h2>
+        <div id="downloadLinks">
+            <a href="https://www.pwabuilder.com/imageGenerator" target="_blank">PWA Builder</a>
+            <a href="https://realfavicongenerator.net/" target="_blank">Favicon Generator</a>
+            <a href="https://app-manifest.firebaseapp.com/" target="_blank">App Manifest Generator</a>
+        </div>
+    </div>
+
+</body>
+</html>

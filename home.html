@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DK EDITS - Video Editing Portfolio</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="DK EDITS - Professional Video Editing Services by Durgesh Kumar">
+    <meta name="theme-color" content="#00ff88">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DK EDITS">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -43,6 +53,10 @@
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
             <div class="nav-actions">
+                <button class="install-btn" id="installBtn" style="display: none;">
+                    <span class="btn-icon">📲</span>
+                    <span class="btn-text">Install App</span>
+                </button>
                 <button class="notification-btn" id="notificationBtn">
                     🔔
                     <span class="notification-badge-dot" id="notificationDot" style="display: none;"></span>
@@ -373,5 +387,56 @@
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
     <script src="script.js"></script>
+    
+    <!-- PWA Install Script -->
+    <script>
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('📲 Install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                alert('ℹ️ App already installed or not available for installation');
+                return;
+            }
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted the install prompt');
+                installBtn.style.display = 'none';
+            } else {
+                console.log('❌ User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 DK EDITS app installed successfully!');
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

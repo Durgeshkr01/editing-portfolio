@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DK EDITS - Login</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="DK EDITS - Professional Video Editing Services by Durgesh Kumar">
+    <meta name="theme-color" content="#00ff88">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DK EDITS">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
     <link rel="stylesheet" href="login-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
@@ -128,6 +138,19 @@
                 }
             }
         });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>

@@ -241,6 +241,38 @@ body {
     box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
+/* Install App Button */
+.install-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    animation: pulse-install 2s ease-in-out infinite;
+}
+
+.install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
+}
+
+.install-btn .btn-icon {
+    font-size: 1.1rem;
+}
+
+@keyframes pulse-install {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
+    50% { box-shadow: 0 4px 25px rgba(255, 107, 53, 0.6); }
+}
+
 /* Hero Section */
 .hero {
     background: var(--gradient-hero);
