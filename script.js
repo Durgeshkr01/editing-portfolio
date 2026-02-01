@@ -287,9 +287,8 @@ function searchUserBookings() {
     const listContainer = document.getElementById('userBookingsList');
     listContainer.innerHTML = '<div class="loading">⏳ Loading your bookings...</div>';
     
-    // Query Firebase for user's bookings
+    // Query Firebase for user's bookings (simple query without orderBy to avoid index requirement)
     bookingsRef.where('clientEmail', '==', email)
-        .orderBy('timestamp', 'desc')
         .get()
         .then((snapshot) => {
             if (snapshot.empty) {
@@ -310,6 +309,13 @@ function searchUserBookings() {
                 });
             });
             
+            // Sort bookings by timestamp on client side (newest first)
+            userBookings.sort((a, b) => {
+                const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+                const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
+                return dateB - dateA;
+            });
+            
             listContainer.innerHTML = userBookings.map(booking => createUserBookingCard(booking)).join('');
         })
         .catch((error) => {
@@ -317,7 +323,7 @@ function searchUserBookings() {
             listContainer.innerHTML = `
                 <div class="no-bookings">
                     <h3>❌ Error</h3>
-                    <p>${error.message}</p>
+                    <p>Unable to load bookings. Please try again.</p>
                 </div>
             `;
         });
