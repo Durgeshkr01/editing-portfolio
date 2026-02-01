@@ -79,6 +79,19 @@
     <script>
         const ADMIN_PASSWORD = 'Durgesh@01';
 
+        // Check if user is already logged in - redirect immediately
+        (function checkLoginStatus() {
+            const userRole = localStorage.getItem('dkEditsUserRole');
+            
+            if (userRole) {
+                if (userRole === 'admin') {
+                    window.location.replace('admin.html');
+                } else if (userRole === 'user') {
+                    window.location.replace('home.html');
+                }
+            }
+        })();
+
         function selectAdmin() {
             document.getElementById('roleSelection').style.display = 'none';
             document.getElementById('adminPasswordForm').style.display = 'block';
@@ -93,8 +106,11 @@
             userBtn.innerHTML = '<span class="loading">Loading...</span>';
             userBtn.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
             
+            // Save user login state
+            localStorage.setItem('dkEditsUserRole', 'user');
+            
             setTimeout(() => {
-                window.location.href = 'home.html';
+                window.location.replace('home.html');
             }, 500);
         }
 
@@ -114,13 +130,16 @@
             if (password === ADMIN_PASSWORD) {
                 errorDiv.textContent = '';
                 
+                // Save admin login state
+                localStorage.setItem('dkEditsUserRole', 'admin');
+                
                 // Success animation
                 const submitBtn = document.querySelector('.submit-btn');
                 submitBtn.textContent = '✓ Success';
                 submitBtn.style.background = '#10b981';
                 
                 setTimeout(() => {
-                    window.location.href = 'admin.html';
+                    window.location.replace('admin.html');
                 }, 500);
             } else {
                 errorDiv.textContent = '❌ Incorrect password!';

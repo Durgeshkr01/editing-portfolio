@@ -4,6 +4,24 @@ const ADMIN_CREDENTIALS = {
     password: 'Durgesh@01'
 };
 
+// Check if admin is logged in
+(function checkAdminAuth() {
+    const userRole = localStorage.getItem('dkEditsUserRole');
+    
+    if (!userRole || userRole !== 'admin') {
+        window.location.replace('index.html');
+        return;
+    }
+})();
+
+// Prevent back button after logout
+window.addEventListener('pageshow', function(event) {
+    const userRole = localStorage.getItem('dkEditsUserRole');
+    if (!userRole || userRole !== 'admin') {
+        window.location.replace('index.html');
+    }
+});
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     showDashboard();
@@ -12,7 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Logout Handler
 document.getElementById('logoutBtn').addEventListener('click', () => {
     if (confirm('Are you sure you want to logout?')) {
-        window.location.href = 'index.html';
+        // Clear login state
+        localStorage.removeItem('dkEditsUserRole');
+        window.location.replace('index.html');
     }
 });
 

@@ -65,6 +65,10 @@
                     <span class="btn-icon">📅</span>
                     <span class="btn-text">Book Now</span>
                 </button>
+                <button class="logout-btn" onclick="logoutUser()" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
+                    <span>🚪</span>
+                    <span class="btn-text">Logout</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -395,6 +399,36 @@
 
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
+    
+    <!-- User Auth Check - Must be before other scripts -->
+    <script>
+        // Check if user is logged in
+        (function checkUserAuth() {
+            const userRole = localStorage.getItem('dkEditsUserRole');
+            
+            if (!userRole || userRole !== 'user') {
+                window.location.replace('index.html');
+                return;
+            }
+        })();
+
+        // Prevent back button after logout
+        window.addEventListener('pageshow', function(event) {
+            const userRole = localStorage.getItem('dkEditsUserRole');
+            if (!userRole || userRole !== 'user') {
+                window.location.replace('index.html');
+            }
+        });
+
+        // Logout function for user
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('dkEditsUserRole');
+                window.location.replace('index.html');
+            }
+        }
+    </script>
+    
     <script src="script.js"></script>
     
     <!-- PWA Install Script -->
