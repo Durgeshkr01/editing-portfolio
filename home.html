@@ -21,6 +21,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- OneSignal Push Notifications -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "a8e46320-37a3-47f6-a316-f0cb1a47c0a3",
+            });
+        });
+    </script>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -399,6 +410,7 @@
 
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
+    <script src="onesignal-config.js"></script>
     
     <!-- User Auth Check - Must be before other scripts -->
     <script>

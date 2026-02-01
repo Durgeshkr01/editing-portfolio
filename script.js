@@ -247,6 +247,17 @@ bookingForm.addEventListener('submit', async (e) => {
         // Save user's email for quick access
         localStorage.setItem('lastBookingEmail', formData.clientEmail);
         
+        // Tag user with email for push notifications
+        if (typeof OneSignal !== 'undefined') {
+            try {
+                await OneSignal.User.addTag("email", formData.clientEmail.toLowerCase());
+                await OneSignal.User.addTag("role", "user");
+                console.log('✅ User tagged for notifications:', formData.clientEmail);
+            } catch (err) {
+                console.log('⚠️ Could not tag user for notifications');
+            }
+        }
+        
         // Show success message
         formMessage.className = 'form-message success';
         formMessage.textContent = '✅ Booking submitted successfully! Total: ₹' + price + '. Check notifications (🔔) to track your booking status.';
