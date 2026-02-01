@@ -319,6 +319,11 @@
         </div>
     </footer>
 
+    <!-- Mobile Floating Book Button -->
+    <button class="mobile-book-btn" id="mobileBookBtn">
+        <span>📅</span> Book Now
+    </button>
+
     <!-- Notification Modal -->
     <div id="notificationModal" class="modal">
         <div class="modal-content">
@@ -439,6 +444,14 @@
                     .catch((error) => {
                         console.log('❌ Service Worker registration failed:', error);
                     });
+            });
+        }
+        
+        // Mobile Book Button Click Handler
+        const mobileBookBtn = document.getElementById('mobileBookBtn');
+        if (mobileBookBtn) {
+            mobileBookBtn.addEventListener('click', () => {
+                document.getElementById('bookNowBtn').click();
             });
         }
     </script>
