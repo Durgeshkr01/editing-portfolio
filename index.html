@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DK EDITS - Login</title>
+    <link rel="stylesheet" href="login-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-section">
+                <img src="WhatsApp Image 2026-02-01 at 9.19.14 AM.jpeg" alt="DK EDITS" class="logo-img">
+                <h1>DK EDITS</h1>
+                <p>Choose your role to continue</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div id="roleSelection" class="role-selection">
+                <button class="role-btn admin-btn" onclick="selectAdmin()">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; margin: 0 auto 0.5rem; border: 3px solid #fff;">
+                        <img src="dp.jpeg" alt="Admin" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <span class="role-name">Admin</span>
+                    <span class="role-desc">Manage bookings & videos</span>
+                </button>
+                <button class="role-btn user-btn" onclick="selectUser()">
+                    <span class="role-icon">👤</span>
+                    <span class="role-name">User</span>
+                    <span class="role-desc">View portfolio & book services</span>
+                </button>
+            </div>
+
+            <!-- Admin Password Form -->
+            <div id="adminPasswordForm" class="password-form" style="display: none;">
+                <button class="back-btn" onclick="showRoleSelection()">← Back</button>
+                <h2>Admin Login</h2>
+                <form onsubmit="adminLogin(event)">
+                    <div class="form-group">
+                        <label for="adminPass">Password</label>
+                        <input type="password" id="adminPass" placeholder="Enter admin password" required autofocus>
+                    </div>
+                    <button type="submit" class="submit-btn">Login</button>
+                </form>
+                <div id="errorMessage" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = 'Durgesh@01';
+
+        function selectAdmin() {
+            document.getElementById('roleSelection').style.display = 'none';
+            document.getElementById('adminPasswordForm').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('adminPass').focus();
+            }, 100);
+        }
+
+        function selectUser() {
+            // Add loading animation
+            const userBtn = document.querySelector('.user-btn');
+            userBtn.innerHTML = '<span class="loading">Loading...</span>';
+            userBtn.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+            
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 500);
+        }
+
+        function showRoleSelection() {
+            document.getElementById('roleSelection').style.display = 'flex';
+            document.getElementById('adminPasswordForm').style.display = 'none';
+            document.getElementById('adminPass').value = '';
+            document.getElementById('errorMessage').textContent = '';
+        }
+
+        function adminLogin(event) {
+            event.preventDefault();
+            
+            const password = document.getElementById('adminPass').value;
+            const errorDiv = document.getElementById('errorMessage');
+            
+            if (password === ADMIN_PASSWORD) {
+                errorDiv.textContent = '';
+                
+                // Success animation
+                const submitBtn = document.querySelector('.submit-btn');
+                submitBtn.textContent = '✓ Success';
+                submitBtn.style.background = '#10b981';
+                
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 500);
+            } else {
+                errorDiv.textContent = '❌ Incorrect password!';
+                document.getElementById('adminPass').value = '';
+                
+                // Shake animation
+                const form = document.querySelector('.password-form form');
+                form.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    form.style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('adminPasswordForm').style.display === 'block') {
+                    showRoleSelection();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

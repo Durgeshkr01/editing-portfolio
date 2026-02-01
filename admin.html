@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DK EDITS - Admin Panel</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- Floating Particles Background -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard">
+        <header class="admin-header">
+            <div class="container">
+                <div class="header-brand">
+                    <div class="brand-logo">
+                        <img src="WhatsApp Image 2026-02-01 at 9.19.14 AM.jpeg" alt="DK EDITS" class="brand-logo-img">
+                        <div class="logo-text">
+                            <h1>DK EDITS</h1>
+                            <span class="logo-subtitle">Admin Dashboard</span>
+                        </div>
+                    </div>
+                </div>
+                <nav class="header-nav">
+                    <button id="manageVideosBtn" class="nav-btn">
+                        <span class="nav-icon">🎬</span>
+                        <span class="nav-text">Videos</span>
+                    </button>
+                    <button id="manageBookingsBtn" class="nav-btn active">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-text">Bookings</span>
+                    </button>
+                </nav>
+                <div class="header-actions">
+                    <div class="admin-profile">
+                        <div class="profile-avatar" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--primary-color);">
+                            <img src="dp.jpeg" alt="Admin" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <span class="profile-name">Admin</span>
+                    </div>
+                    <button id="logoutBtn" class="btn-logout">
+                        <span>🚪</span> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="admin-main">
+            <div class="container admin-content">
+                <!-- Video Management Section -->
+                <div id="videoManagementSection" class="section-panel" style="display: none;">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="section-icon">🎬</span>
+                            <div>
+                                <h2>Video Portfolio</h2>
+                                <p class="section-subtitle">Manage your video collection</p>
+                            </div>
+                        </div>
+                        <button id="addVideoBtn" class="btn btn-primary btn-glow">
+                            <span>+</span> Add New Video
+                        </button>
+                    </div>
+
+                    <div id="videosList" class="videos-list">
+                        <!-- Videos will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Booking Management Section -->
+                <div id="bookingManagementSection" class="section-panel">
+                    <!-- Welcome Banner -->
+                    <div class="welcome-banner">
+                        <div class="welcome-content">
+                            <h2>Welcome Back, Admin! 👋</h2>
+                            <p>Here's what's happening with your bookings today</p>
+                        </div>
+                        <div class="welcome-illustration">📊</div>
+                    </div>
+
+                    <!-- Notification Badge -->
+                    <div class="notification-badge" id="notificationBadge">
+                        <span class="notification-icon">🔔</span>
+                        <span class="notification-text"><span id="notificationCount">0</span> New Booking Requests</span>
+                        <span class="notification-arrow">→</span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card stat-pending">
+                            <div class="stat-glow"></div>
+                            <div class="stat-icon-wrap">
+                                <span class="stat-icon">⏳</span>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="pendingCount">0</h3>
+                                <p>Pending Requests</p>
+                            </div>
+                            <div class="stat-trend">
+                                <span class="trend-icon">📈</span>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-approved">
+                            <div class="stat-glow"></div>
+                            <div class="stat-icon-wrap">
+                                <span class="stat-icon">✅</span>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="approvedCount">0</h3>
+                                <p>Approved</p>
+                            </div>
+                            <div class="stat-trend">
+                                <span class="trend-icon">🎉</span>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-rejected">
+                            <div class="stat-glow"></div>
+                            <div class="stat-icon-wrap">
+                                <span class="stat-icon">❌</span>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="rejectedCount">0</h3>
+                                <p>Rejected</p>
+                            </div>
+                            <div class="stat-trend">
+                                <span class="trend-icon">📉</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bookings List -->
+                    <div class="bookings-section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span class="section-icon">📋</span>
+                                <div>
+                                    <h2>All Bookings</h2>
+                                    <p class="section-subtitle">Review and manage booking requests</p>
+                                </div>
+                            </div>
+                            <div class="filter-tabs">
+                                <button class="filter-tab active" data-filter="all">All</button>
+                                <button class="filter-tab" data-filter="pending">Pending</button>
+                                <button class="filter-tab" data-filter="approved">Approved</button>
+                                <button class="filter-tab" data-filter="rejected">Rejected</button>
+                            </div>
+                        </div>
+                        <div id="bookingsList" class="bookings-list">
+                            <!-- Bookings will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="admin-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-brand">
+                        <img src="WhatsApp Image 2026-02-01 at 9.19.14 AM.jpeg" alt="DK EDITS" class="footer-logo-img">
+                        <span class="footer-text">DK EDITS</span>
+                    </div>
+                    <div class="footer-links">
+                        <a href="home.html" class="footer-link">🌐 View Portfolio</a>
+                        <a href="#" class="footer-link">📖 Documentation</a>
+                        <a href="#" class="footer-link">💬 Support</a>
+                    </div>
+                    <div class="footer-copyright">
+                        <p>© 2026 All Rights Reserved | Made with ❤️</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Video Add/Edit Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="videoModalTitle">Add New Video</h2>
+                <button class="close-btn" id="closeVideoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="videoForm">
+                    <input type="hidden" id="videoId">
+                    
+                    <div class="form-group">
+                        <label for="videoTitle">Video Title *</label>
+                        <input type="text" id="videoTitle" required placeholder="e.g., Wedding Highlight Film">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="videoDescription">Description *</label>
+                        <textarea id="videoDescription" rows="3" required placeholder="Brief description of the video..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="instagramUrl">Instagram Post URL *</label>
+                        <input type="url" id="instagramUrl" required placeholder="https://www.instagram.com/p/ABC123/">
+                        <small style="color: var(--text-light); font-size: 0.875rem;">Paste the Instagram post link here</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="thumbnailUrl">Thumbnail Image URL (Optional)</label>
+                        <input type="url" id="thumbnailUrl" placeholder="https://example.com/image.jpg">
+                        <small style="color: var(--text-light); font-size: 0.875rem;">Leave empty to use default gradient</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="videoCategory">Category</label>
+                        <select id="videoCategory">
+                            <option value="wedding">Wedding</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="social">Social Media</option>
+                            <option value="event">Event</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-submit">Save Video</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>
