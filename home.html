@@ -364,11 +364,15 @@
                     
                     <div class="form-group">
                         <label for="serviceType">Service Type *</label>
-                        <select id="serviceType" name="serviceType" required>
+                        <select id="serviceType" name="serviceType" required onchange="updatePrice()">
                             <option value="">Select a service</option>
-                            <option value="editing">🎬 Video Editing Only</option>
-                            <option value="videography_editing">🎥 Videography + Editing</option>
+                            <option value="editing">🎬 Video Editing Only - ₹150</option>
+                            <option value="videography_editing">🎥 Videography + Editing - ₹300</option>
                         </select>
+                        <div id="priceDisplay" class="price-display" style="display: none;">
+                            <span class="price-label">Total Price:</span>
+                            <span class="price-amount" id="priceAmount">₹0</span>
+                        </div>
                     </div>
                     
                     <div class="form-group">

@@ -1748,6 +1748,37 @@ section {
     border: 1px solid rgba(255, 100, 100, 0.3);
 }
 
+/* Price Display */
+.selected-price {
+    display: none;
+    margin-top: 0.5rem;
+    padding: 0.8rem 1rem;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 255, 136, 0.05));
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    animation: priceSlide 0.3s ease;
+}
+
+@keyframes priceSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.price-tag {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .contact-methods {
     display: flex;
     flex-direction: column;
@@ -2051,4 +2082,42 @@ section {
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
+}
+
+/* Price Display in Booking Form */
+.price-display {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 212, 255, 0.1));
+    border-radius: 12px;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    animation: priceAppear 0.4s ease;
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.15);
+}
+
+@keyframes priceAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.price-label {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.price-amount {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
 }

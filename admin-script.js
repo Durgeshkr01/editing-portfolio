@@ -223,6 +223,10 @@ function createBookingCard(booking) {
                     <span class="service-badge">${serviceText}</span>
                 </div>
                 <div class="info-item">
+                    <span class="info-label">Price</span>
+                    <span class="info-value price-highlight">₹${booking.price || (booking.serviceType === 'editing' ? 150 : 300)}</span>
+                </div>
+                <div class="info-item">
                     <span class="info-label">Booked On</span>
                     <span class="info-value">${bookingDate}</span>
                 </div>

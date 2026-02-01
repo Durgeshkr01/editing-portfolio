@@ -32,6 +32,11 @@
     </div>
 
     <div class="login-container">
+        <!-- Install App Button -->
+        <button class="install-app-btn" id="installBtn" style="display: none;">
+            <span>📲</span> Install App
+        </button>
+        
         <div class="login-box">
             <div class="logo-section">
                 <img src="WhatsApp Image 2026-02-01 at 9.19.14 AM.jpeg" alt="DK EDITS" class="logo-img">
@@ -151,6 +156,41 @@
                     });
             });
         }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('📲 Install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                alert('ℹ️ App already installed or not available for installation');
+                return;
+            }
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted the install prompt');
+                installBtn.style.display = 'none';
+            } else {
+                console.log('❌ User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 DK EDITS app installed successfully!');
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+        });
     </script>
 </body>
 </html>

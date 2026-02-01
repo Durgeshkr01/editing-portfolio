@@ -820,6 +820,13 @@ body::before {
     font-weight: 600;
 }
 
+.info-value.price-highlight {
+    color: #00ff88;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+}
+
 .service-badge {
     background: var(--gradient-primary);
     color: #0a0a0f;

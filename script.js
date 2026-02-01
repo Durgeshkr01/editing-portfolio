@@ -192,6 +192,26 @@ window.addEventListener('scroll', () => {
     });
 });
 
+// Service Prices
+const PRICES = {
+    editing: 150,
+    videography_editing: 300
+};
+
+// Update Price Display
+function updatePrice() {
+    const serviceType = document.getElementById('serviceType').value;
+    const priceDisplay = document.getElementById('priceDisplay');
+    const priceAmount = document.getElementById('priceAmount');
+    
+    if (serviceType && PRICES[serviceType]) {
+        priceDisplay.style.display = 'flex';
+        priceAmount.textContent = '₹' + PRICES[serviceType];
+    } else {
+        priceDisplay.style.display = 'none';
+    }
+}
+
 // Booking Form Handler
 const bookingForm = document.getElementById('bookingForm');
 const formMessage = document.getElementById('formMessage');
@@ -204,6 +224,9 @@ bookingForm.addEventListener('submit', async (e) => {
     submitBtn.textContent = '⏳ Submitting...';
     submitBtn.disabled = true;
     
+    const serviceType = document.getElementById('serviceType').value;
+    const price = PRICES[serviceType] || 0;
+    
     try {
         // Get form data
         const formData = {
@@ -212,6 +235,7 @@ bookingForm.addEventListener('submit', async (e) => {
             clientPhone: document.getElementById('clientPhone').value,
             serviceType: document.getElementById('serviceType').value,
             projectDetails: document.getElementById('projectDetails').value,
+            price: price,
             status: 'pending',
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             approvedDate: null
@@ -225,11 +249,12 @@ bookingForm.addEventListener('submit', async (e) => {
         
         // Show success message
         formMessage.className = 'form-message success';
-        formMessage.textContent = '✅ Booking submitted successfully! Check notifications (🔔) to track your booking status.';
+        formMessage.textContent = '✅ Booking submitted successfully! Total: ₹' + price + '. Check notifications (🔔) to track your booking status.';
         formMessage.style.display = 'block';
         
-        // Reset form
+        // Reset form and hide price
         bookingForm.reset();
+        document.getElementById('priceDisplay').style.display = 'none';
         
         // Close modal after 3 seconds
         setTimeout(() => {
@@ -238,7 +263,7 @@ bookingForm.addEventListener('submit', async (e) => {
             formMessage.style.display = 'none';
         }, 3000);
         
-        console.log('📩 New booking submitted to Firestore');
+        console.log('📩 New booking submitted to Firestore with price:', price);
     } catch (error) {
         console.error('❌ Error submitting booking:', error);
         formMessage.className = 'form-message error';
@@ -346,32 +371,60 @@ function createUserBookingCard(booking) {
 }
 
 // Check for notifications
-// Check for new notifications from Firebase
-function checkNotifications() {
+// Real-time listener for notifications from Firebase
+function setupNotificationListener() {
     const lastEmail = localStorage.getItem('lastBookingEmail');
     if (!lastEmail) return;
     
-    // Query Firebase for user's updated bookings
+    // Real-time listener for user's bookings
     bookingsRef
         .where('clientEmail', '==', lastEmail.toLowerCase())
-        .where('status', 'in', ['approved', 'rejected'])
-        .get()
-        .then((snapshot) => {
+        .onSnapshot((snapshot) => {
             const notificationDot = document.getElementById('notificationDot');
-            if (!snapshot.empty) {
+            let hasUpdates = false;
+            
+            snapshot.forEach((doc) => {
+                const booking = doc.data();
+                if (booking.status === 'approved' || booking.status === 'rejected') {
+                    hasUpdates = true;
+                }
+            });
+            
+            if (hasUpdates) {
                 notificationDot.style.display = 'block';
+                // Show browser notification if permission granted
+                showBrowserNotification();
             } else {
                 notificationDot.style.display = 'none';
             }
-        })
-        .catch((error) => {
+        }, (error) => {
             console.error('❌ Error checking notifications:', error);
         });
+}
+
+// Browser Push Notification
+function showBrowserNotification() {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('DK EDITS - Booking Update! 🎬', {
+            body: 'Your booking status has been updated. Click to check!',
+            icon: 'icons/icon-192x192.png',
+            badge: 'icons/icon-72x72.png'
+        });
+    }
+}
+
+// Request notification permission
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
 }
 
 // Check notifications on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadVideosFromFirebase();
+    setupNotificationListener();
+    requestNotificationPermission();
     
     // Auto-fill email if exists
     const lastEmail = localStorage.getItem('lastBookingEmail');
