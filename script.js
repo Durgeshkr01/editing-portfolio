@@ -258,6 +258,23 @@ bookingForm.addEventListener('submit', async (e) => {
             }
         }
         
+        // Send push notification to admin
+        try {
+            await fetch('/api/send-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'new_booking',
+                    clientName: formData.clientName,
+                    clientEmail: formData.clientEmail,
+                    servicetype: formData.serviceType === 'editing' ? 'Video Editing' : 'Videography + Editing'
+                })
+            });
+            console.log('✅ Admin notification sent');
+        } catch (err) {
+            console.log('⚠️ Could not send admin notification');
+        }
+        
         // Show success message
         formMessage.className = 'form-message success';
         formMessage.textContent = '✅ Booking submitted successfully! Total: ₹' + price + '. Check notifications (🔔) to track your booking status.';

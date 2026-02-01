@@ -262,37 +262,81 @@ function createBookingCard(booking) {
     `;
 }
 
-function approveBooking(id, approvedDate) {
-    // Update booking status in Firestore
-    bookingsRef.doc(id).update({
-        status: 'approved',
-        approvedDate: approvedDate,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
+async function approveBooking(id, approvedDate) {
+    try {
+        // Get booking data first
+        const bookingDoc = await bookingsRef.doc(id).get();
+        const bookingData = bookingDoc.data();
+        
+        // Update booking status in Firestore
+        await bookingsRef.doc(id).update({
+            status: 'approved',
+            approvedDate: approvedDate,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Send push notification to user
+        try {
+            await fetch('/api/send-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'booking_approved',
+                    clientName: bookingData.clientName,
+                    clientEmail: bookingData.clientEmail
+                })
+            });
+            console.log('✅ User notification sent');
+        } catch (err) {
+            console.log('⚠️ Could not send user notification');
+        }
+        
         alert(`✅ Booking approved! Notification sent to client.`);
         console.log('✅ Booking approved:', id);
-    }).catch((error) => {
+    } catch (error) {
         console.error('❌ Error approving booking:', error);
         alert('❌ Error approving booking: ' + error.message);
-    });
+    }
 }
 
-function rejectBooking(id) {
+async function rejectBooking(id) {
     if (!confirm('Are you sure you want to reject this booking?')) {
         return;
     }
     
-    // Update booking status in Firestore
-    bookingsRef.doc(id).update({
-        status: 'rejected',
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
+    try {
+        // Get booking data first
+        const bookingDoc = await bookingsRef.doc(id).get();
+        const bookingData = bookingDoc.data();
+        
+        // Update booking status in Firestore
+        await bookingsRef.doc(id).update({
+            status: 'rejected',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Send push notification to user
+        try {
+            await fetch('/api/send-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'booking_rejected',
+                    clientName: bookingData.clientName,
+                    clientEmail: bookingData.clientEmail
+                })
+            });
+            console.log('✅ User notification sent');
+        } catch (err) {
+            console.log('⚠️ Could not send user notification');
+        }
+        
         alert(`❌ Booking rejected. Notification sent to client.`);
         console.log('✅ Booking rejected:', id);
-    }).catch((error) => {
+    } catch (error) {
         console.error('❌ Error rejecting booking:', error);
         alert('❌ Error rejecting booking: ' + error.message);
-    });
+    }
 }
 
 function sendNotificationToClient(booking, status) {
