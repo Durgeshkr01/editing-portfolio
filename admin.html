@@ -29,9 +29,19 @@
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
                 appId: "a8e46320-37a3-47f6-a316-f0cb1a47c0a3",
+                notifyButton: {
+                    enable: true
+                },
+                allowLocalhostAsSecureOrigin: true
             });
+            
+            // Request permission for push notifications (like Flipkart)
+            const permission = await OneSignal.Notifications.requestPermission();
+            console.log('🔔 Admin notification permission:', permission);
+            
             // Tag admin for notifications
             await OneSignal.User.addTag("role", "admin");
+            console.log('✅ Admin tagged for push notifications');
         });
     </script>
 </head>

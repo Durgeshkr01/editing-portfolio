@@ -24,7 +24,15 @@
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
                 appId: "a8e46320-37a3-47f6-a316-f0cb1a47c0a3",
+                notifyButton: {
+                    enable: true
+                },
+                allowLocalhostAsSecureOrigin: true
             });
+            
+            // Request notification permission early (like Flipkart)
+            const permission = await OneSignal.Notifications.requestPermission();
+            console.log('🔔 Login page notification permission:', permission);
         });
     </script>
 </head>

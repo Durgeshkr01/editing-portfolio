@@ -29,7 +29,22 @@
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
                 appId: "a8e46320-37a3-47f6-a316-f0cb1a47c0a3",
+                notifyButton: {
+                    enable: true
+                },
+                allowLocalhostAsSecureOrigin: true
             });
+            
+            // Request permission for push notifications like Flipkart
+            const permission = await OneSignal.Notifications.requestPermission();
+            console.log('🔔 User notification permission:', permission);
+            
+            // Get user email from localStorage and tag
+            const savedEmail = localStorage.getItem('lastBookingEmail');
+            if (savedEmail) {
+                await OneSignal.User.addTag("email", savedEmail.toLowerCase());
+                await OneSignal.User.addTag("role", "user");
+            }
         });
     </script>
 </head>
