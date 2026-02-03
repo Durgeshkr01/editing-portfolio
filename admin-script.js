@@ -268,6 +268,10 @@ async function approveBooking(id, approvedDate) {
         const bookingDoc = await bookingsRef.doc(id).get();
         const bookingData = bookingDoc.data();
         
+        // Calculate price
+        const price = bookingData.price || (bookingData.serviceType === 'editing' ? 150 : 300);
+        const serviceText = bookingData.serviceType === 'editing' ? 'Video Editing Only' : 'Videography + Editing';
+        
         // Update booking status in Firestore
         await bookingsRef.doc(id).update({
             status: 'approved',
@@ -283,12 +287,35 @@ async function approveBooking(id, approvedDate) {
                 body: JSON.stringify({
                     type: 'booking_approved',
                     clientName: bookingData.clientName,
-                    clientEmail: bookingData.clientEmail
+                    clientEmail: bookingData.clientEmail,
+                    clientPhone: bookingData.clientPhone
                 })
             });
             console.log('✅ User notification sent');
         } catch (err) {
             console.log('⚠️ Could not send user notification');
+        }
+        
+        // Send WhatsApp message to user 📱
+        if (bookingData.clientPhone) {
+            const whatsappMessage = `🎉 *DK EDITS - Booking Approved!*\n\n` +
+                `Hello *${bookingData.clientName}* ji! 👋\n\n` +
+                `✅ Your booking has been *APPROVED*!\n\n` +
+                `📋 *Booking Details:*\n` +
+                `━━━━━━━━━━━━━━━━━━\n` +
+                `📅 Approved Date: *${approvedDate}*\n` +
+                `🎬 Service: *${serviceText}*\n` +
+                `💰 Amount: *₹${price}*\n` +
+                `━━━━━━━━━━━━━━━━━━\n\n` +
+                `🙏 Thank you for choosing DK EDITS!\n` +
+                `We will contact you soon for further details.\n\n` +
+                `📞 For any queries, feel free to reach out!\n\n` +
+                `With love ❤️\n` +
+                `*DK EDITS Team*`;
+            
+            // Open WhatsApp with pre-filled message
+            const whatsappUrl = `https://wa.me/91${bookingData.clientPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappUrl, '_blank');
         }
         
         alert(`✅ Booking approved! Notification sent to client.`);
@@ -323,12 +350,30 @@ async function rejectBooking(id) {
                 body: JSON.stringify({
                     type: 'booking_rejected',
                     clientName: bookingData.clientName,
-                    clientEmail: bookingData.clientEmail
+                    clientEmail: bookingData.clientEmail,
+                    clientPhone: bookingData.clientPhone
                 })
             });
             console.log('✅ User notification sent');
         } catch (err) {
             console.log('⚠️ Could not send user notification');
+        }
+        
+        // Send WhatsApp message for rejection too
+        if (bookingData.clientPhone) {
+            const whatsappMessage = `😔 *DK EDITS - Booking Update*\n\n` +
+                `Hello *${bookingData.clientName}* ji,\n\n` +
+                `We regret to inform you that your booking request could not be approved at this time.\n\n` +
+                `Please feel free to:\n` +
+                `• Try booking for a different date\n` +
+                `• Contact us for more details\n\n` +
+                `We apologize for any inconvenience.\n\n` +
+                `With regards,\n` +
+                `*DK EDITS Team* ❤️`;
+            
+            // Open WhatsApp with pre-filled message
+            const whatsappUrl = `https://wa.me/91${bookingData.clientPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappUrl, '_blank');
         }
         
         alert(`❌ Booking rejected. Notification sent to client.`);

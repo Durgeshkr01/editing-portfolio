@@ -29,6 +29,30 @@ const closeNotificationModal = document.getElementById('closeNotificationModal')
 bookNowBtn.addEventListener('click', () => {
     bookingModal.classList.add('active');
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    
+    // Auto-fill name and phone from login data
+    const loggedInName = localStorage.getItem('dkEditsUserName');
+    const loggedInMobile = localStorage.getItem('dkEditsUserMobile');
+    
+    if (loggedInName) {
+        const nameField = document.getElementById('clientName');
+        if (nameField) {
+            nameField.value = loggedInName;
+            nameField.readOnly = true;
+            nameField.style.background = '#f0f9ff';
+            nameField.style.cursor = 'not-allowed';
+        }
+    }
+    
+    if (loggedInMobile) {
+        const phoneField = document.getElementById('clientPhone');
+        if (phoneField) {
+            phoneField.value = loggedInMobile;
+            phoneField.readOnly = true;
+            phoneField.style.background = '#f0f9ff';
+            phoneField.style.cursor = 'not-allowed';
+        }
+    }
 });
 
 closeModal.addEventListener('click', () => {
@@ -39,8 +63,28 @@ closeModal.addEventListener('click', () => {
 notificationBtn.addEventListener('click', () => {
     notificationModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    document.getElementById('searchEmail').value = '';
-    document.getElementById('userBookingsList').innerHTML = '';
+    
+    // Get logged in user info
+    const userName = localStorage.getItem('dkEditsUserName') || 'User';
+    const userMobile = localStorage.getItem('dkEditsUserMobile') || '';
+    
+    // Show user welcome info
+    const welcomeNameEl = document.getElementById('welcomeUserName');
+    const welcomeMobileEl = document.getElementById('welcomeUserMobile');
+    if (welcomeNameEl) welcomeNameEl.textContent = userName;
+    if (welcomeMobileEl) welcomeMobileEl.textContent = userMobile;
+    
+    // Auto-load bookings for this user
+    if (userMobile) {
+        loadUserBookingsByMobile(userMobile);
+    } else {
+        document.getElementById('userBookingsList').innerHTML = `
+            <div class="no-bookings">
+                <h3>❌ Login Required</h3>
+                <p>Please login with your name and mobile to see your bookings.</p>
+            </div>
+        `;
+    }
 });
 
 closeNotificationModal.addEventListener('click', () => {
@@ -228,11 +272,14 @@ bookingForm.addEventListener('submit', async (e) => {
     const price = PRICES[serviceType] || 0;
     
     try {
-        // Get form data
+        // Get form data - use login name and mobile
+        const loggedInName = localStorage.getItem('dkEditsUserName') || '';
+        const loggedInMobile = localStorage.getItem('dkEditsUserMobile') || '';
+        
         const formData = {
-            clientName: document.getElementById('clientName').value,
+            clientName: loggedInName || document.getElementById('clientName').value,
             clientEmail: document.getElementById('clientEmail').value,
-            clientPhone: document.getElementById('clientPhone').value,
+            clientPhone: loggedInMobile || document.getElementById('clientPhone').value,
             serviceType: document.getElementById('serviceType').value,
             projectDetails: document.getElementById('projectDetails').value,
             price: price,
@@ -244,17 +291,23 @@ bookingForm.addEventListener('submit', async (e) => {
         // Save to Firestore
         await bookingsRef.add(formData);
         
-        // Save user's email for quick access
-        localStorage.setItem('lastBookingEmail', formData.clientEmail);
-        
-        // Tag user with email for push notifications
+        // Tag user with mobile for push notifications and save subscription ID
         if (typeof OneSignal !== 'undefined') {
             try {
-                await OneSignal.User.addTag("email", formData.clientEmail.toLowerCase());
+                // Get subscription ID
+                const subscriptionId = await OneSignal.User.PushSubscription.id;
+                if (subscriptionId) {
+                    localStorage.setItem('onesignal_subscription_id', subscriptionId);
+                    console.log('✅ Subscription ID:', subscriptionId);
+                }
+                
+                // Tag user
+                await OneSignal.User.addTag("mobile", formData.clientPhone);
                 await OneSignal.User.addTag("role", "user");
-                console.log('✅ User tagged for notifications:', formData.clientEmail);
+                await OneSignal.User.addTag("name", formData.clientName);
+                console.log('✅ User tagged for notifications:', formData.clientPhone);
             } catch (err) {
-                console.log('⚠️ Could not tag user for notifications');
+                console.log('⚠️ Could not tag user for notifications:', err);
             }
         }
         
@@ -267,6 +320,7 @@ bookingForm.addEventListener('submit', async (e) => {
                     type: 'new_booking',
                     clientName: formData.clientName,
                     clientEmail: formData.clientEmail,
+                    clientPhone: formData.clientPhone,
                     servicetype: formData.serviceType === 'editing' ? 'Video Editing' : 'Videography + Editing'
                 })
             });
@@ -303,19 +357,72 @@ bookingForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Search user bookings from Firebase
+// Load user bookings by mobile number (auto-load)
+function loadUserBookingsByMobile(mobile) {
+    const listContainer = document.getElementById('userBookingsList');
+    listContainer.innerHTML = '<div class="loading">⏳ Loading your bookings...</div>';
+    
+    // Query Firebase for user's bookings by phone number
+    bookingsRef.where('clientPhone', '==', mobile)
+        .get()
+        .then((snapshot) => {
+            if (snapshot.empty) {
+                listContainer.innerHTML = `
+                    <div class="no-bookings">
+                        <h3>📭 No Bookings Yet</h3>
+                        <p>You haven't made any bookings yet. Click "Book Now" to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const userBookings = [];
+            snapshot.forEach((doc) => {
+                userBookings.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            // Sort bookings by timestamp on client side (newest first)
+            userBookings.sort((a, b) => {
+                const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+                const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
+                return dateB - dateA;
+            });
+            
+            listContainer.innerHTML = userBookings.map(booking => createUserBookingCard(booking)).join('');
+        })
+        .catch((error) => {
+            console.error('❌ Error fetching bookings:', error);
+            listContainer.innerHTML = `
+                <div class="no-bookings">
+                    <h3>❌ Error</h3>
+                    <p>Unable to load bookings. Please try again.</p>
+                </div>
+            `;
+        });
+}
+
+// Legacy function for email search (kept for backward compatibility)
 function searchUserBookings() {
-    const email = document.getElementById('searchEmail').value.trim().toLowerCase();
+    const email = document.getElementById('searchEmail')?.value?.trim()?.toLowerCase();
     
     if (!email) {
-        alert('Please enter your email address');
+        // Try loading by mobile instead
+        const userMobile = localStorage.getItem('dkEditsUserMobile');
+        if (userMobile) {
+            loadUserBookingsByMobile(userMobile);
+        } else {
+            alert('Please login to see your bookings');
+        }
         return;
     }
     
     const listContainer = document.getElementById('userBookingsList');
     listContainer.innerHTML = '<div class="loading">⏳ Loading your bookings...</div>';
     
-    // Query Firebase for user's bookings (simple query without orderBy to avoid index requirement)
+    // Query Firebase for user's bookings
     bookingsRef.where('clientEmail', '==', email)
         .get()
         .then((snapshot) => {
@@ -407,12 +514,12 @@ function createUserBookingCard(booking) {
 // Check for notifications
 // Real-time listener for notifications from Firebase
 function setupNotificationListener() {
-    const lastEmail = localStorage.getItem('lastBookingEmail');
-    if (!lastEmail) return;
+    const userMobile = localStorage.getItem('dkEditsUserMobile');
+    if (!userMobile) return;
     
-    // Real-time listener for user's bookings
+    // Real-time listener for user's bookings by mobile
     bookingsRef
-        .where('clientEmail', '==', lastEmail.toLowerCase())
+        .where('clientPhone', '==', userMobile)
         .onSnapshot((snapshot) => {
             const notificationDot = document.getElementById('notificationDot');
             let hasUpdates = false;

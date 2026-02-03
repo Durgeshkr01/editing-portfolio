@@ -33,6 +33,13 @@
             // Request notification permission early (like Flipkart)
             const permission = await OneSignal.Notifications.requestPermission();
             console.log('🔔 Login page notification permission:', permission);
+            
+            // Save subscription ID early
+            const subscriptionId = await OneSignal.User.PushSubscription.id;
+            if (subscriptionId) {
+                localStorage.setItem('onesignal_subscription_id', subscriptionId);
+                console.log('✅ Subscription ID saved on login page:', subscriptionId);
+            }
         });
     </script>
 </head>
@@ -72,11 +79,29 @@
                     <span class="role-name">Admin</span>
                     <span class="role-desc">Manage bookings & videos</span>
                 </button>
-                <button class="role-btn user-btn" onclick="selectUser()">
+                <button class="role-btn user-btn" onclick="showUserLoginForm()">
                     <span class="role-icon">👤</span>
                     <span class="role-name">User</span>
                     <span class="role-desc">View portfolio & book services</span>
                 </button>
+            </div>
+
+            <!-- User Login Form -->
+            <div id="userLoginForm" class="password-form" style="display: none;">
+                <button class="back-btn" onclick="showRoleSelection()">← Back</button>
+                <h2>User Login</h2>
+                <form onsubmit="userLogin(event)">
+                    <div class="form-group">
+                        <label for="userName">Your Name *</label>
+                        <input type="text" id="userName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userMobile">Mobile Number *</label>
+                        <input type="tel" id="userMobile" placeholder="Enter mobile number (10 digits)" pattern="[0-9]{10}" required>
+                    </div>
+                    <button type="submit" class="submit-btn">🚀 Continue</button>
+                </form>
+                <div id="userErrorMessage" class="error-message"></div>
             </div>
 
             <!-- Admin Password Form -->
@@ -119,14 +144,42 @@
             }, 100);
         }
 
-        function selectUser() {
-            // Add loading animation
-            const userBtn = document.querySelector('.user-btn');
-            userBtn.innerHTML = '<span class="loading">Loading...</span>';
-            userBtn.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+        function showUserLoginForm() {
+            document.getElementById('roleSelection').style.display = 'none';
+            document.getElementById('userLoginForm').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('userName').focus();
+            }, 100);
+        }
+
+        function userLogin(event) {
+            event.preventDefault();
             
-            // Save user login state
+            const userName = document.getElementById('userName').value.trim();
+            const userMobile = document.getElementById('userMobile').value.trim();
+            const errorDiv = document.getElementById('userErrorMessage');
+            
+            if (!userName || !userMobile) {
+                errorDiv.textContent = '❌ Please fill all fields!';
+                return;
+            }
+            
+            if (userMobile.length !== 10 || !/^[0-9]+$/.test(userMobile)) {
+                errorDiv.textContent = '❌ Please enter a valid 10-digit mobile number!';
+                return;
+            }
+            
+            errorDiv.textContent = '';
+            
+            // Save user login data
             localStorage.setItem('dkEditsUserRole', 'user');
+            localStorage.setItem('dkEditsUserName', userName);
+            localStorage.setItem('dkEditsUserMobile', userMobile);
+            
+            // Success animation
+            const submitBtn = document.querySelector('#userLoginForm .submit-btn');
+            submitBtn.textContent = '✓ Welcome!';
+            submitBtn.style.background = '#10b981';
             
             setTimeout(() => {
                 window.location.replace('home.html');
@@ -136,8 +189,16 @@
         function showRoleSelection() {
             document.getElementById('roleSelection').style.display = 'flex';
             document.getElementById('adminPasswordForm').style.display = 'none';
+            document.getElementById('userLoginForm').style.display = 'none';
             document.getElementById('adminPass').value = '';
             document.getElementById('errorMessage').textContent = '';
+            // Clear user form if exists
+            const userName = document.getElementById('userName');
+            const userMobile = document.getElementById('userMobile');
+            const userError = document.getElementById('userErrorMessage');
+            if (userName) userName.value = '';
+            if (userMobile) userMobile.value = '';
+            if (userError) userError.textContent = '';
         }
 
         function adminLogin(event) {

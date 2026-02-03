@@ -7,9 +7,69 @@ const ONESIGNAL_API_URL = "https://onesignal.com/api/v1/notifications";
 
 // Note: For sending notifications from client-side, we'll use OneSignal's 
 // "Segments" feature. Admin will be tagged with "role: admin" and users 
-// will be tagged with their email.
+// will be tagged with their mobile number.
 
-// Tag current user with their email (call after booking)
+// Wait for OneSignal to be ready and tag user
+async function initOneSignalTags() {
+    try {
+        // Wait for OneSignal to be ready
+        if (typeof OneSignal === 'undefined') {
+            console.log('⏳ Waiting for OneSignal SDK...');
+            return;
+        }
+        
+        // Get subscription ID and save it
+        const subscriptionId = await OneSignal.User.PushSubscription.id;
+        if (subscriptionId) {
+            localStorage.setItem('onesignal_subscription_id', subscriptionId);
+            console.log('✅ OneSignal Subscription ID saved:', subscriptionId);
+        }
+        
+        // Tag user based on role
+        const userRole = localStorage.getItem('dkEditsUserRole');
+        const userName = localStorage.getItem('dkEditsUserName');
+        const userMobile = localStorage.getItem('dkEditsUserMobile');
+        
+        if (userRole === 'admin') {
+            await OneSignal.User.addTag("role", "admin");
+            console.log('✅ Tagged as admin');
+        } else if (userRole === 'user' && userMobile) {
+            await OneSignal.User.addTag("role", "user");
+            await OneSignal.User.addTag("mobile", userMobile);
+            if (userName) {
+                await OneSignal.User.addTag("name", userName);
+            }
+            console.log('✅ Tagged as user with mobile:', userMobile);
+        }
+    } catch (error) {
+        console.error('❌ Error in OneSignal tagging:', error);
+    }
+}
+
+// Tag user with mobile number (call after login/booking)
+async function tagUserWithMobile(mobile, name) {
+    try {
+        if (typeof OneSignal !== 'undefined') {
+            await OneSignal.User.addTag("mobile", mobile);
+            await OneSignal.User.addTag("role", "user");
+            if (name) {
+                await OneSignal.User.addTag("name", name);
+            }
+            
+            // Also save subscription ID
+            const subscriptionId = await OneSignal.User.PushSubscription.id;
+            if (subscriptionId) {
+                localStorage.setItem('onesignal_subscription_id', subscriptionId);
+            }
+            
+            console.log('✅ User tagged with mobile:', mobile);
+        }
+    } catch (error) {
+        console.error('❌ Error tagging user:', error);
+    }
+}
+
+// Tag current user with their email (legacy - kept for backward compatibility)
 async function tagUserWithEmail(email) {
     try {
         if (typeof OneSignal !== 'undefined') {

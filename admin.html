@@ -35,13 +35,30 @@
                 allowLocalhostAsSecureOrigin: true
             });
             
-            // Request permission for push notifications (like Flipkart)
+            // Request permission for push notifications
             const permission = await OneSignal.Notifications.requestPermission();
             console.log('🔔 Admin notification permission:', permission);
+            
+            // Get and save subscription ID for admin
+            const subscriptionId = await OneSignal.User.PushSubscription.id;
+            if (subscriptionId) {
+                localStorage.setItem('onesignal_admin_subscription_id', subscriptionId);
+                console.log('✅ Admin Subscription ID saved:', subscriptionId);
+            }
             
             // Tag admin for notifications
             await OneSignal.User.addTag("role", "admin");
             console.log('✅ Admin tagged for push notifications');
+            
+            // Listen for subscription changes
+            OneSignal.User.PushSubscription.addEventListener('change', async (event) => {
+                console.log('🔔 Admin subscription changed:', event);
+                const newSubId = await OneSignal.User.PushSubscription.id;
+                if (newSubId) {
+                    localStorage.setItem('onesignal_admin_subscription_id', newSubId);
+                    await OneSignal.User.addTag("role", "admin");
+                }
+            });
         });
     </script>
 </head>
