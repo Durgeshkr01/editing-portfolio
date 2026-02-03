@@ -910,6 +910,35 @@ section {
     font-size: 1rem;
 }
 
+/* View All Videos Button Container */
+.view-all-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+.view-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+}
+
+.view-all-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 255, 136, 0.5);
+}
+
+.view-all-btn span {
+    font-size: 1.3rem;
+}
+
 /* Contact Section */
 .contact {
     background: linear-gradient(180deg, #0f0f18 0%, #0a0a0f 100%);

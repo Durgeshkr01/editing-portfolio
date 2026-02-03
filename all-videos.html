@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Videos - DK EDITS</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="DK EDITS - All Video Editing Projects by Durgesh Kumar">
+    <meta name="theme-color" content="#00ff88">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DK EDITS">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Page specific styles */
+        .all-videos-page {
+            min-height: 100vh;
+            padding-top: 100px;
+            background: var(--bg-dark);
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .back-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+        
+        .back-home-btn:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-neon);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        
+        .video-count {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50px;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        
+        .all-videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+        
+        .loading-videos {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 255, 136, 0.2);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 136, 0.1);
+        }
+        
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h3 {
+            color: var(--text-white);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: var(--text-light);
+        }
+        
+        /* Footer for all videos page */
+        .simple-footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            color: var(--text-light);
+        }
+        
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .all-videos-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles Background -->
+    <div class="particles-bg">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Simple Navbar -->
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="home.html" class="nav-logo">
+                <span class="logo-icon">🎬</span>
+                <span class="logo-text">DK EDITS</span>
+            </a>
+            <div class="nav-right">
+                <a href="home.html" class="back-link" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="all-videos-page">
+        <div class="container">
+            <div class="page-header">
+                <a href="home.html" class="back-home-btn">
+                    <span>←</span> Back to Home
+                </a>
+                <h1 class="page-title">🎥 All My Videos</h1>
+                <p class="page-subtitle">Complete collection of my video editing projects</p>
+                <div class="video-count" id="videoCount">Loading...</div>
+            </div>
+            
+            <div class="all-videos-grid" id="allVideosGrid">
+                <div class="loading-videos">
+                    <div class="loading-spinner"></div>
+                    <p>Loading videos...</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="simple-footer">
+            <p>© 2026 DK EDITS. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        // Check login status
+        (function checkLoginStatus() {
+            const userRole = localStorage.getItem('dkEditsUserRole');
+            if (!userRole) {
+                window.location.replace('index.html');
+            }
+        })();
+        
+        // Get Firestore reference
+        const db = firebase.firestore();
+        const videosRef = db.collection('videos');
+        
+        // Load all videos
+        function loadAllVideos() {
+            const videosGrid = document.getElementById('allVideosGrid');
+            const videoCount = document.getElementById('videoCount');
+            
+            videosRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+                const videos = [];
+                snapshot.forEach((doc) => {
+                    videos.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Update count
+                videoCount.textContent = `${videos.length} Video${videos.length !== 1 ? 's' : ''}`;
+                
+                if (videos.length === 0) {
+                    videosGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🎬</div>
+                            <h3>No Videos Yet</h3>
+                            <p>Check back soon for amazing video editing work!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Display all videos
+                videosGrid.innerHTML = videos.map(video => createVideoCard(video)).join('');
+            }, (error) => {
+                console.error('❌ Error loading videos:', error);
+                videosGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <h3>Error Loading Videos</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            });
+        }
+        
+        function createVideoCard(video) {
+            const thumbnailHTML = video.thumbnailUrl 
+                ? `<img src="${video.thumbnailUrl}" alt="${video.title}">`
+                : `<div class="project-placeholder">🎬</div>`;
+            
+            return `
+                <div class="project-card">
+                    <div class="project-image">
+                        ${thumbnailHTML}
+                        <div class="play-overlay">
+                            <div class="play-icon">▶</div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>${video.title}</h3>
+                        <p>${video.description}</p>
+                        <a href="${video.instagramUrl}" target="_blank" class="view-on-instagram">
+                            📸 View on Instagram
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadAllVideos);
+    </script>
+</body>
+</html>

@@ -466,6 +466,19 @@ body::before {
     box-shadow: 0 0 35px rgba(255, 100, 100, 0.6);
 }
 
+.btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
+}
+
+.btn-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(37, 211, 102, 0.6);
+}
+
 .error-message {
     color: var(--danger-color);
     text-align: center;
@@ -1394,6 +1407,7 @@ body::before {
 .stat-pending .stat-glow { background: radial-gradient(circle, rgba(245, 158, 11, 0.3), transparent 70%); }
 .stat-approved .stat-glow { background: radial-gradient(circle, rgba(16, 185, 129, 0.3), transparent 70%); }
 .stat-rejected .stat-glow { background: radial-gradient(circle, rgba(239, 68, 68, 0.3), transparent 70%); }
+.stat-income .stat-glow { background: radial-gradient(circle, rgba(0, 255, 136, 0.4), transparent 70%); }
 
 .stat-card:hover {
     transform: translateY(-8px) scale(1.02);
@@ -1418,6 +1432,17 @@ body::before {
 .stat-pending .stat-icon-wrap { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1)); }
 .stat-approved .stat-icon-wrap { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1)); }
 .stat-rejected .stat-icon-wrap { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1)); }
+.stat-income .stat-icon-wrap { background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.1)); }
+
+.stat-income {
+    border-color: rgba(0, 255, 136, 0.4);
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 212, 255, 0.05));
+}
+
+.stat-income .stat-info h3 {
+    color: #00ff88 !important;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+}
 
 .stat-icon {
     animation: bounce 2s infinite;

@@ -39,8 +39,10 @@ bookNowBtn.addEventListener('click', () => {
         if (nameField) {
             nameField.value = loggedInName;
             nameField.readOnly = true;
-            nameField.style.background = '#f0f9ff';
+            nameField.style.background = 'rgba(0, 255, 136, 0.15)';
+            nameField.style.color = '#00ff88';
             nameField.style.cursor = 'not-allowed';
+            nameField.style.borderColor = 'rgba(0, 255, 136, 0.4)';
         }
     }
     
@@ -49,8 +51,10 @@ bookNowBtn.addEventListener('click', () => {
         if (phoneField) {
             phoneField.value = loggedInMobile;
             phoneField.readOnly = true;
-            phoneField.style.background = '#f0f9ff';
+            phoneField.style.background = 'rgba(0, 255, 136, 0.15)';
+            phoneField.style.color = '#00ff88';
             phoneField.style.cursor = 'not-allowed';
+            phoneField.style.borderColor = 'rgba(0, 255, 136, 0.4)';
         }
     }
 });
@@ -578,6 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function loadVideosFromFirebase() {
     const videoPortfolio = document.getElementById('videoPortfolio');
     const emptyPortfolio = document.getElementById('emptyPortfolio');
+    const viewAllContainer = document.getElementById('viewAllContainer');
     
     // Real-time listener for videos
     videosRef.orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
@@ -592,13 +597,21 @@ function loadVideosFromFirebase() {
         if (videos.length === 0) {
             videoPortfolio.style.display = 'none';
             emptyPortfolio.style.display = 'block';
+            if (viewAllContainer) viewAllContainer.style.display = 'none';
             return;
         }
         
         videoPortfolio.style.display = 'grid';
         emptyPortfolio.style.display = 'none';
         
-        videoPortfolio.innerHTML = videos.map(video => createVideoCard(video)).join('');
+        // Show only first 6 videos on home page
+        const displayVideos = videos.slice(0, 6);
+        videoPortfolio.innerHTML = displayVideos.map(video => createVideoCard(video)).join('');
+        
+        // Show "View All" button if more than 6 videos
+        if (viewAllContainer) {
+            viewAllContainer.style.display = videos.length > 6 ? 'flex' : 'none';
+        }
     }, (error) => {
         console.error('❌ Error loading videos:', error);
         videoPortfolio.innerHTML = `

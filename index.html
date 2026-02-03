@@ -176,6 +176,9 @@
             localStorage.setItem('dkEditsUserName', userName);
             localStorage.setItem('dkEditsUserMobile', userMobile);
             
+            // Tag user for push notifications
+            tagUserForNotifications(userName, userMobile);
+            
             // Success animation
             const submitBtn = document.querySelector('#userLoginForm .submit-btn');
             submitBtn.textContent = '✓ Welcome!';
@@ -184,6 +187,20 @@
             setTimeout(() => {
                 window.location.replace('home.html');
             }, 500);
+        }
+        
+        // Tag user with OneSignal for push notifications
+        async function tagUserForNotifications(name, mobile) {
+            try {
+                if (typeof OneSignal !== 'undefined') {
+                    await OneSignal.User.addTag("role", "user");
+                    await OneSignal.User.addTag("mobile", mobile);
+                    await OneSignal.User.addTag("name", name);
+                    console.log('✅ User tagged for notifications:', mobile);
+                }
+            } catch (error) {
+                console.log('⚠️ Could not tag user for notifications');
+            }
         }
 
         function showRoleSelection() {

@@ -40,15 +40,47 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 document.getElementById('manageVideosBtn').addEventListener('click', () => {
     document.getElementById('videoManagementSection').style.display = 'block';
     document.getElementById('bookingManagementSection').style.display = 'none';
+    document.getElementById('manageVideosBtn').classList.add('active');
+    document.getElementById('manageBookingsBtn').classList.remove('active');
     loadAdminVideos();
 });
 
 document.getElementById('manageBookingsBtn').addEventListener('click', () => {
     document.getElementById('videoManagementSection').style.display = 'none';
     document.getElementById('bookingManagementSection').style.display = 'block';
+    document.getElementById('manageBookingsBtn').classList.add('active');
+    document.getElementById('manageVideosBtn').classList.remove('active');
     loadBookings();
     updateStats();
 });
+
+// Filter Tabs for Bookings
+let currentFilter = 'all';
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        // Update active state
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Apply filter
+        currentFilter = tab.dataset.filter;
+        filterBookings(currentFilter);
+    });
+});
+
+function filterBookings(filter) {
+    const bookingCards = document.querySelectorAll('.booking-card');
+    
+    bookingCards.forEach(card => {
+        if (filter === 'all') {
+            card.style.display = 'block';
+        } else if (card.classList.contains(filter)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
 
 // Video Modal Handlers
 const videoModal = document.getElementById('videoModal');
@@ -184,7 +216,26 @@ function loadBookings() {
                     rejectBtn.addEventListener('click', () => rejectBooking(booking.id));
                 }
             }
+            
+            // Delete button for approved/rejected bookings
+            if (booking.status === 'approved' || booking.status === 'rejected') {
+                const deleteBtn = document.getElementById(`delete-${booking.id}`);
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => deleteBooking(booking.id, booking.clientName));
+                }
+            }
+            
+            // WhatsApp button for approved bookings
+            if (booking.status === 'approved') {
+                const whatsappBtn = document.getElementById(`whatsapp-${booking.id}`);
+                if (whatsappBtn) {
+                    whatsappBtn.addEventListener('click', () => sendWhatsAppMessage(booking));
+                }
+            }
         });
+        
+        // Re-apply current filter after loading
+        filterBookings(currentFilter);
         
         updateStats();
     }, (error) => {
@@ -218,6 +269,16 @@ function createBookingCard(booking) {
         actionsHTML = `
             <div class="project-details">
                 <strong>✅ Approved Date: ${booking.approvedDate}</strong>
+            </div>
+            <div class="booking-actions">
+                <button id="whatsapp-${booking.id}" class="btn btn-whatsapp">📱 WhatsApp</button>
+                <button id="delete-${booking.id}" class="btn btn-danger">🗑️ Delete</button>
+            </div>
+        `;
+    } else if (booking.status === 'rejected') {
+        actionsHTML = `
+            <div class="booking-actions">
+                <button id="delete-${booking.id}" class="btn btn-danger">🗑️ Delete</button>
             </div>
         `;
     }
@@ -395,6 +456,45 @@ function sendNotificationToClient(booking, status) {
     // You can integrate with email services like EmailJS, SendGrid, etc.
 }
 
+// Delete booking function
+async function deleteBooking(id, clientName) {
+    if (!confirm(`Are you sure you want to delete booking for "${clientName}"?\n\nThis action cannot be undone!`)) {
+        return;
+    }
+    
+    try {
+        await bookingsRef.doc(id).delete();
+        alert('✅ Booking deleted successfully!');
+        console.log('✅ Booking deleted:', id);
+        updateStats();
+    } catch (error) {
+        console.error('❌ Error deleting booking:', error);
+        alert('❌ Error deleting booking: ' + error.message);
+    }
+}
+
+// Send WhatsApp message to approved booking
+function sendWhatsAppMessage(booking) {
+    const price = booking.price || (booking.serviceType === 'editing' ? 150 : 300);
+    const serviceText = booking.serviceType === 'editing' ? 'Video Editing Only' : 'Videography + Editing';
+    
+    const whatsappMessage = `🎉 *DK EDITS - Reminder*\n\n` +
+        `Hello *${booking.clientName}* ji! 👋\n\n` +
+        `This is a reminder about your approved booking:\n\n` +
+        `📋 *Booking Details:*\n` +
+        `━━━━━━━━━━━━━━━━━━\n` +
+        `📅 Approved Date: *${booking.approvedDate}*\n` +
+        `🎬 Service: *${serviceText}*\n` +
+        `💰 Amount: *₹${price}*\n` +
+        `━━━━━━━━━━━━━━━━━━\n\n` +
+        `📞 For any queries, feel free to reach out!\n\n` +
+        `With love ❤️\n` +
+        `*DK EDITS Team*`;
+    
+    const whatsappUrl = `https://wa.me/91${booking.clientPhone}?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
 function updateStats() {
     // Real-time stats from Firestore
     bookingsRef.get().then((snapshot) => {
@@ -407,9 +507,18 @@ function updateStats() {
         const approved = bookings.filter(b => b.status === 'approved').length;
         const rejected = bookings.filter(b => b.status === 'rejected').length;
         
+        // Calculate total income from approved bookings
+        const totalIncome = bookings
+            .filter(b => b.status === 'approved')
+            .reduce((sum, b) => {
+                const price = b.price || (b.serviceType === 'editing' ? 150 : 300);
+                return sum + price;
+            }, 0);
+        
         document.getElementById('pendingCount').textContent = pending;
         document.getElementById('approvedCount').textContent = approved;
         document.getElementById('rejectedCount').textContent = rejected;
+        document.getElementById('totalIncome').textContent = '₹' + totalIncome.toLocaleString('en-IN');
         document.getElementById('notificationCount').textContent = pending;
         
         // Show/hide notification badge
