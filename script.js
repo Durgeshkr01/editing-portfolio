@@ -608,9 +608,9 @@ function loadVideosFromFirebase() {
         const displayVideos = videos.slice(0, 6);
         videoPortfolio.innerHTML = displayVideos.map(video => createVideoCard(video)).join('');
         
-        // Show "View All" button if more than 6 videos
+        // Show "View All" button if there are videos
         if (viewAllContainer) {
-            viewAllContainer.style.display = videos.length > 6 ? 'flex' : 'none';
+            viewAllContainer.style.display = videos.length > 0 ? 'flex' : 'none';
         }
     }, (error) => {
         console.error('❌ Error loading videos:', error);
